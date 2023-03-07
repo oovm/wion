@@ -1,13 +1,13 @@
 use std::fmt::Write;
 
-pub(crate) trait IndentDebug {
-    fn debug_indent<W: Write>(&self, f: &mut IndentFormatter<'_, W>, level: usize) -> std::fmt::Result;
+pub(crate) trait IndentDisplay {
+    fn indent_display<W: Write>(&self, f: &mut IndentFormatter<'_, W>) -> std::fmt::Result;
 }
 
 pub(crate) struct IndentFormatter<'a, W> {
-    writer: W,
-    indent_text: &'a str,
-    level: usize,
+    pub writer: W,
+    pub indent_text: &'a str,
+    pub level: usize,
 }
 
 impl<'a, W: Write> Write for IndentFormatter<'a, W> {

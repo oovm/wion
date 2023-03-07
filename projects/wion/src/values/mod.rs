@@ -1,10 +1,11 @@
+use std::sync::Arc;
+
 mod convert;
 #[cfg(feature = "serde")]
 mod der;
 mod display;
 #[cfg(feature = "serde")]
 mod ser;
-
 
 /// https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 pub enum WasiValue {
@@ -33,5 +34,38 @@ pub enum WasiValue {
     /// The UTF-8 character
     Unicode(char),
     /// The UTF-8 string
-    UTF8(String),
+    UTF8(Arc<str>),
+    /// Record value
+    Object(Arc<WasiStructure>),
+}
+
+/// ```wion
+/// record {a: value, b: value}
+/// (a: value, b: value)
+/// variant(value)
+/// [0: value, 1: value]
+/// ```
+#[derive(Debug)]
+pub struct WasiStructure {
+    pub kind: WasiStructureKind,
+    pub typing: Arc<str>,
+    pub terms: Vec<WasiValue>,
+}
+
+#[derive(Debug)]
+pub enum WasiStructureKind {
+    /// `record {a: value, b: value}`
+    Record,
+    /// `(a: value, b: value)`
+    Tuple,
+    /// `[0: value, 1: value]`
+    List,
+}
+
+#[derive(Debug)]
+pub struct WasiPair {
+    /// The key of the wasi pair, can be a string or a number or nothing
+    pub key: Arc<str>,
+    /// The value of the wasi pair
+    pub value: WasiValue,
 }

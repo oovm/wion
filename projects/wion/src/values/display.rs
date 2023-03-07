@@ -1,9 +1,14 @@
-use crate::WasiValue;
-use std::fmt::{Debug, Formatter};
+use crate::{
+    helpers::{IndentDisplay, IndentFormatter},
+    values::WasiStructure,
+    WasiValue,
+};
+use std::fmt::{Debug, Display, Formatter, Write};
 
 impl Debug for WasiValue {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::None => f.write_str("none"),
             Self::Boolean(v) => match v {
                 true => f.write_str("true"),
                 false => f.write_str("false"),
@@ -44,7 +49,40 @@ impl Debug for WasiValue {
             Self::UTF8(v) => {
                 write!(f, "{:?}", v)
             }
+            WasiValue::Object(_) => f.write_str("Any"),
         }
     }
 }
 
+impl Display for WasiValue {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        self.indent_display(&mut IndentFormatter { writer: f, indent_text: "    ", level: 0 })
+    }
+}
+
+impl IndentDisplay for WasiValue {
+    fn indent_display<W: Write>(&self, f: &mut IndentFormatter<'_, W>) -> std::fmt::Result {
+        match self {
+            Self::None => f.write_str("none"),
+            Self::Boolean(v) => write!(f, "{}", v),
+            Self::Unsigned8(v) => write!(f, "{}", v),
+            Self::Unsigned16(v) => write!(f, "{}", v),
+            Self::Unsigned32(v) => write!(f, "{}", v),
+            Self::Unsigned64(v) => write!(f, "{}", v),
+            Self::Integer8(v) => write!(f, "{}", v),
+            Self::Integer16(v) => write!(f, "{}", v),
+            Self::Integer32(v) => write!(f, "{}", v),
+            Self::Integer64(v) => write!(f, "{}", v),
+            Self::Float32(v) => write!(f, "{}", v),
+            Self::Float64(v) => write!(f, "{}", v),
+            Self::Unicode(v) => write!(f, "{:?}", v),
+            Self::UTF8(v) => write!(f, "{:?}", v),
+            Self::Object(v) => v.indent_display(f),
+        }
+    }
+}
+impl IndentDisplay for WasiStructure {
+    fn indent_display<W: Write>(&self, f: &mut IndentFormatter<'_, W>) -> std::fmt::Result {
+        Ok(())
+    }
+}

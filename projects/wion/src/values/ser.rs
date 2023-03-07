@@ -20,6 +20,8 @@ impl Serialize for WasiValue {
             Self::Float64(v) => serializer.serialize_f64(*v),
             Self::Unicode(v) => serializer.serialize_char(*v),
             Self::UTF8(v) => serializer.serialize_str(v),
+            WasiValue::None => {}
+            WasiValue::Object(_) => {}
         }
     }
 }
