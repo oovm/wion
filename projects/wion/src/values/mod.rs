@@ -1,8 +1,10 @@
 mod convert;
 #[cfg(feature = "serde")]
-mod ser;
-#[cfg(feature = "serde")]
 mod der;
+mod display;
+#[cfg(feature = "serde")]
+mod ser;
+
 
 /// https://github.com/WebAssembly/component-model/blob/main/design/mvp/WIT.md
 pub enum WasiValue {
@@ -33,4 +35,3 @@ pub enum WasiValue {
     /// The UTF-8 string
     UTF8(String),
 }
-

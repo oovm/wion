@@ -6,6 +6,10 @@
 
 mod errors;
 mod values;
+mod parser;
+mod helpers;
 
-pub use crate::errors::{WasiError, Result};
-pub use crate::values::WasiValue;
+pub use crate::{
+    errors::{Result, WasiError},
+    values::WasiValue,
+};
