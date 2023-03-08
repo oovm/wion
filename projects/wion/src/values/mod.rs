@@ -35,8 +35,10 @@ pub enum WasiValue {
     Unicode(char),
     /// The UTF-8 string
     UTF8(Arc<str>),
+    /// Compact binary data
+    Buffer(Arc<[u8]>),
     /// Record value
-    Object(Arc<WasiStructure>),
+    Object(Arc<WasiObject>),
 }
 
 /// ```wion
@@ -46,20 +48,30 @@ pub enum WasiValue {
 /// [0: value, 1: value]
 /// ```
 #[derive(Debug)]
-pub struct WasiStructure {
-    pub kind: WasiStructureKind,
-    pub typing: Arc<str>,
+pub struct WasiObject {
+    pub kind: WasiObjectKind,
     pub terms: Vec<WasiValue>,
 }
 
-#[derive(Debug)]
-pub enum WasiStructureKind {
-    /// `record {a: value, b: value}`
-    Record,
-    /// `(a: value, b: value)`
-    Tuple,
+#[derive(Clone, Debug)]
+pub enum WasiObjectKind {
+    /// `{a: value, b: value}`
+    Record { typing: Arc<str> },
+    /// `-[read, "write"]`
+    /// `+[read, "write"]`
+    Flags {
+        /// the flag typing
+        typing: Arc<str>
+    },
     /// `[0: value, 1: value]`
     List,
+    /// `variant(value)`
+    Variant {
+        /// The name of the variant
+        typing: Arc<str>,
+    },
+    /// `(a: value, b: value)`
+    Tuple,
 }
 
 #[derive(Debug)]
@@ -68,4 +80,28 @@ pub struct WasiPair {
     pub key: Arc<str>,
     /// The value of the wasi pair
     pub value: WasiValue,
+}
+
+impl From<WasiObject> for WasiValue {
+    fn from(value: WasiObject) -> Self {
+        Self::Object(Arc::new(value))
+    }
+}
+
+impl WasiObject {
+    /// Create a new record
+    pub fn none() -> Self {
+        Self { kind: WasiObjectKind::Variant { typing: Arc::from("none") }, terms: vec![] }
+    }
+    /// Create a new record
+    pub fn unit() -> Self {
+        Self { kind: WasiObjectKind::Tuple {}, terms: vec![] }
+    }
+    pub fn variant<N, I>(name: N, values: I) -> Self
+    where
+        N: Into<Arc<str>>,
+        I: IntoIterator<Item = WasiValue>,
+    {
+        Self { kind: WasiObjectKind::Variant { typing: name.into() }, terms: values.into_iter().collect() }
+    }
 }

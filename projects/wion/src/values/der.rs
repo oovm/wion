@@ -1,9 +1,9 @@
-use crate::WasiValue;
+use crate::{values::WasiObject, WasiValue};
 use serde::{
     de::{EnumAccess, Error, MapAccess, SeqAccess, Visitor},
     Deserialize, Deserializer,
 };
-use std::fmt::Formatter;
+use std::{fmt::Formatter, sync::Arc};
 
 struct WasiVisitor {
     value: WasiValue,
@@ -128,35 +128,35 @@ impl<'de> Visitor<'de> for WasiValue {
     where
         E: Error,
     {
-        Ok(WasiValue::UTF8(v.to_string()))
+        Ok(WasiValue::UTF8(Arc::from(v)))
     }
 
     fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
     where
         E: Error,
     {
-        Ok(WasiValue::UTF8(v))
+        Ok(WasiValue::UTF8(Arc::from(v)))
     }
 
     fn visit_bytes<E>(self, v: &[u8]) -> Result<Self::Value, E>
     where
         E: Error,
     {
-        todo!()
+        Ok(WasiValue::Buffer(Arc::from(v)))
     }
 
     fn visit_byte_buf<E>(self, v: Vec<u8>) -> Result<Self::Value, E>
     where
         E: Error,
     {
-        todo!()
+        Ok(WasiValue::Buffer(Arc::from(v)))
     }
 
     fn visit_none<E>(self) -> Result<Self::Value, E>
     where
         E: Error,
     {
-        todo!()
+        Ok(WasiValue::Object(Arc::new(WasiObject::none())))
     }
 
     fn visit_some<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
@@ -170,7 +170,7 @@ impl<'de> Visitor<'de> for WasiValue {
     where
         E: Error,
     {
-        todo!()
+        Ok(WasiValue::Object(Arc::new(WasiObject::unit())))
     }
 
     fn visit_newtype_struct<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
@@ -201,3 +201,4 @@ impl<'de> Visitor<'de> for WasiValue {
         todo!()
     }
 }
+

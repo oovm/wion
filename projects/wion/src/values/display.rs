@@ -1,6 +1,6 @@
 use crate::{
     helpers::{IndentDisplay, IndentFormatter},
-    values::WasiStructure,
+    values::WasiObject,
     WasiValue,
 };
 use std::fmt::{Debug, Display, Formatter, Write};
@@ -8,7 +8,6 @@ use std::fmt::{Debug, Display, Formatter, Write};
 impl Debug for WasiValue {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::None => f.write_str("none"),
             Self::Boolean(v) => match v {
                 true => f.write_str("true"),
                 false => f.write_str("false"),
@@ -50,6 +49,9 @@ impl Debug for WasiValue {
                 write!(f, "{:?}", v)
             }
             WasiValue::Object(_) => f.write_str("Any"),
+            WasiValue::Buffer(v) => {
+                write!(f, "{:?}", v)
+            }
         }
     }
 }
@@ -63,7 +65,6 @@ impl Display for WasiValue {
 impl IndentDisplay for WasiValue {
     fn indent_display<W: Write>(&self, f: &mut IndentFormatter<'_, W>) -> std::fmt::Result {
         match self {
-            Self::None => f.write_str("none"),
             Self::Boolean(v) => write!(f, "{}", v),
             Self::Unsigned8(v) => write!(f, "{}", v),
             Self::Unsigned16(v) => write!(f, "{}", v),
@@ -77,11 +78,14 @@ impl IndentDisplay for WasiValue {
             Self::Float64(v) => write!(f, "{}", v),
             Self::Unicode(v) => write!(f, "{:?}", v),
             Self::UTF8(v) => write!(f, "{:?}", v),
+            Self::Buffer(v) => {
+                write!(f, "{:?}", v)
+            }
             Self::Object(v) => v.indent_display(f),
         }
     }
 }
-impl IndentDisplay for WasiStructure {
+impl IndentDisplay for WasiObject {
     fn indent_display<W: Write>(&self, f: &mut IndentFormatter<'_, W>) -> std::fmt::Result {
         Ok(())
     }

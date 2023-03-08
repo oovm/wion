@@ -211,7 +211,7 @@ impl WasiValue {
         }
     }
     /// Try to convert the value to a record
-    pub fn as_structure(&self) -> Option<&WasiStructure> {
+    pub fn as_structure(&self) -> Option<&WasiObject> {
         match self {
             Self::Object(v) => Some(v),
             _ => None,
