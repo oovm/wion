@@ -5,11 +5,13 @@
 #![doc(html_favicon_url = "https://raw.githubusercontent.com/oovm/shape-rs/dev/projects/images/Trapezohedron.svg")]
 
 mod errors;
-mod values;
-mod parser;
 mod helpers;
+mod objects;
+mod parser;
+mod values;
 
 pub use crate::{
     errors::{Result, WasiError},
+    objects::flags::{ExcludeFlags, IncludeFlags},
     values::WasiValue,
 };

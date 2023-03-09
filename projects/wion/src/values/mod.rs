@@ -74,6 +74,7 @@ pub enum WasiObjectKind {
     Tuple,
 }
 
+
 #[derive(Debug)]
 pub struct WasiPair {
     /// The key of the wasi pair, can be a string or a number or nothing
